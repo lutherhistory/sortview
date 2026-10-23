@@ -5,87 +5,96 @@
 #include <time.h>
 
 
-#define WIDTH  900
+#define BG  (Color) { 0x18, 0x18, 0x18, 0xff }
+
+#define WIDTH  800
 #define HEIGHT 600
+
+
+typedef bool (*Algorithm)(int*, size_t);
+
+static int a = 0;
+static int b = 0;
+
 
 void swap(int *a, int *b)
 {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+    int t;
+
+     t  = *a;
+     *a = *b;
+     *b =  t;
 }
 
-void update(bool (*algorithm)(int *items, int count), int *items, int count, float dt)
+int *create_items(size_t count)
 {
-    (void) dt;
-    
+    int *items = malloc(sizeof(int) * count);
+
+    for (size_t i=0; i < count; i++)
+    {
+        items[i] = i + 1;
+    }
+
+    return items;
+}
+
+void shuffle_items(int *items, size_t count)
+{
+    srand(time(0));
+    for (int i=0; i < count; i++)
+    {
+        int j = rand() % (i+1);
+        swap(&items[i], &items[j]);
+    }
+}
+
+void update_sorting(Algorithm algorithm, int *items, size_t count)
+{
     if (algorithm(items, count))
     {
         TraceLog(LOG_INFO, "Done!");
     }
 }
 
-bool bubble_sort(int *items, int count)
+bool bubble_sort(int *items, size_t count)
 {
-    static int i = 0, j = 1, n = 0;
-    if (n == 0)
-        n = count;
-
-    if (items[i] > items[j])
+    if (items[a] > items[b])
     {
-        swap(&items[i], &items[j]);
+        swap(&items[a], &items[b]);
     }
-    else
-    {
-        
-    }
-    j = j % (n - 1) + 1, i = j - 1;
 
-    
+    b = b % count + 1, a = b - 1;
+
     return false;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-    int count  = 10;
-    int *items = (int*)calloc((size_t)count, sizeof(int));
-    
+    size_t count = 10;
+    int   *items = create_items(count);
+    Algorithm algorithm = bubble_sort;
+
+
     if (!items)
     {
-        perror("calloc");
+        fprintf(stderr, "%s: empty array\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    srand(time(NULL));
-    for (int i=0; i < count; i++)
-    {
-        items[i] = i + 1;
-    }
-    // shuffle
-    for (int i=0; i < count; i++)
-    {
-        int j = rand() % (1 + i);
-        
-        swap(&items[i], &items[j]);
-    }
+    shuffle_items(items, count);
     
-    
-    InitWindow(WIDTH, HEIGHT, "sortview");
-    SetTargetFPS(60);
 
-    bool (*algorithm)(int *items, int count) = &bubble_sort;
+    InitWindow(WIDTH, HEIGHT, "sortview -- recreational project");
+    SetTargetFPS(count);
 
     while (!WindowShouldClose())
     {
-        float dt = GetFrameTime();
+        update_sorting(algorithm, items, count);
+        
 
-        update(algorithm, items, count, dt);
-        
-        
         BeginDrawing();
-
-        ClearBackground(BLACK);
-
+        
+        ClearBackground(BG);
         for (int i=0; i < count; i++)
         {
             Vector2 size = {
@@ -98,16 +107,22 @@ int main(void)
                 HEIGHT - size.y
             };
 
-            size.x *= 0.8;
-            
-            DrawRectangleV(pos, size, RAYWHITE);
-        }
+            Color color = RAYWHITE;
+            if (a == i || b == i)
+            {
+                color = RED;
+            }
 
+            size.x *= 0.9f;
+            
+            
+            DrawRectangleV(pos, size, color);
+        }
+        
         EndDrawing();
     }
 
     free(items);
-
     CloseWindow();
     return 0;
 }
