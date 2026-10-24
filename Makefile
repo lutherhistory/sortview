@@ -1,7 +1,7 @@
 TARGET = build/bin/sortview
 
 CC     = gcc
-CFLGAS = -Wall -Wextra -Wpedantic
+CFLAGS = -Wall -Wextra -Wpedantic -fsanitize=address
 LDS    = -lraylib -lm
 
 INC    = -I./include

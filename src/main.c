@@ -11,118 +11,149 @@
 #define HEIGHT 600
 
 
-typedef bool (*Algorithm)(int*, size_t);
+typedef struct Element
+{
+    int   *items;
+    size_t capc;
+    size_t size;
 
-static int a = 0;
-static int b = 0;
+    int  a;
+    int  b;
+} Element;
+
+typedef void (*Algorithm)(Element*);
+
+
+int left    = 0;
+int swapped = 0;
 
 
 void swap(int *a, int *b)
 {
-    int t;
-
-     t  = *a;
-     *a = *b;
-     *b =  t;
+    int t  = *a;
+    *a = *b;
+    *b =  t;
 }
 
-int *create_items(size_t count)
+void draw_items(Element *element)
 {
-    int *items = malloc(sizeof(int) * count);
+    Color color = RAYWHITE;
 
-    for (size_t i=0; i < count; i++)
+
+    for (int i=0; i < element->size; i++)
     {
-        items[i] = i + 1;
-    }
+        Rectangle graph = {
+            .width  = WIDTH  / element->size,
+            .height = HEIGHT / element->size * element->items[i]
+        };
+        graph.x = i * graph.width;
+        graph.y = HEIGHT - graph.height;
 
-    return items;
+        float padding = graph.width - (graph.width * 0.9f);
+        graph.x     += padding * 0.5f;
+        graph.width -= padding;
+
+
+        if (left < element->size)
+        {
+            color = (
+                (i == element->a || i == element->b)
+                ?
+                RED
+                :
+                RAYWHITE
+            );
+        }
+        else
+        {
+            color = LIME;
+        }
+
+
+        DrawRectangleRec(graph, color);
+    }
 }
 
-void shuffle_items(int *items, size_t count)
+void show_graph(Element *element, Algorithm algorithm)
 {
-    srand(time(0));
-    for (int i=0; i < count; i++)
-    {
-        int j = rand() % (i+1);
-        swap(&items[i], &items[j]);
-    }
-}
+    InitWindow(WIDTH, HEIGHT, "sortview -- yes yes welcome");
+    SetTargetFPS(10);
 
-void update_sorting(Algorithm algorithm, int *items, size_t count)
-{
-    if (algorithm(items, count))
-    {
-        TraceLog(LOG_INFO, "Done!");
-    }
-}
-
-bool bubble_sort(int *items, size_t count)
-{
-    if (items[a] > items[b])
-    {
-        swap(&items[a], &items[b]);
-    }
-
-    b = b % count + 1, a = b - 1;
-
-    return false;
-}
-
-int main(int argc, char **argv)
-{
-    size_t count = 10;
-    int   *items = create_items(count);
-    Algorithm algorithm = bubble_sort;
-
-
-    if (!items)
-    {
-        fprintf(stderr, "%s: empty array\n", argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    shuffle_items(items, count);
-    
-
-    InitWindow(WIDTH, HEIGHT, "sortview -- recreational project");
-    SetTargetFPS(count);
 
     while (!WindowShouldClose())
     {
-        update_sorting(algorithm, items, count);
-        
+        algorithm(element);
 
+        
         BeginDrawing();
         
         ClearBackground(BG);
-        for (int i=0; i < count; i++)
-        {
-            Vector2 size = {
-                WIDTH  / count,
-                HEIGHT / count * items[i]
-            };
+        draw_items(element);
 
-            Vector2 pos  = {
-                i * size.x,
-                HEIGHT - size.y
-            };
-
-            Color color = RAYWHITE;
-            if (a == i || b == i)
-            {
-                color = RED;
-            }
-
-            size.x *= 0.9f;
-            
-            
-            DrawRectangleV(pos, size, color);
-        }
+        DrawText(TextFormat("swapped: %d", swapped), 0, 0, 30, GREEN);
         
         EndDrawing();
     }
 
-    free(items);
     CloseWindow();
+}
+
+void bubble_sort(Element *element)
+{
+    if (left < element->size) {
+        if (element->items[element->a] > element->items[element->b])
+        {
+            swap(&element->items[element->a], &element->items[element->b]);
+            swapped++;
+        }
+        
+        element->b = element->b % (element->size - left) + 1;
+        if (!(element->a = element->b - 1))
+        {
+            left++;
+        }
+    }
+}
+
+int main(void)
+{
+    Element   element;
+    Algorithm algorithm = bubble_sort;
+
+
+    // Element's allocation
+    element.capc  = 20;
+    element.size  = 1;
+    element.items = malloc(sizeof(*element.items) * element.size);
+
+    element.a     = 0;
+    element.b     = 0;
+
+
+    for (size_t i=1; i <= element.capc; i++)
+    {
+        element.items      = realloc(element.items, sizeof(*element.items) * i);
+        element.items[i-1] = i;
+        element.size       = i;
+    }
+
+    // Element's value
+    srand(time(0));
+    for (int i=0; i < element.size; i++)
+    {
+        int j = rand() % (i+1);
+        swap(&element.items[j], &element.items[i]);
+    }
+    for (int i=0; i < element.size; i++)
+    {
+        printf("%d, ", element.items[i]);
+    }
+    printf("\n");
+
+    // Shows with graph
+    show_graph(&element, algorithm);
+    
+    // Releasing the memory
+    free(element.items);
     return 0;
 }
