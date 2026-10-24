@@ -14,7 +14,7 @@ OBJ    = $(patsubst src/%.c, build/cache/%.o, $(SRC))
 all: $(TARGET)
 
 run: $(TARGET)
-	./$<
+	./$< $(ARGS)
 
 
 $(TARGET): $(OBJ)

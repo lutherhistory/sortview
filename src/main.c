@@ -50,7 +50,7 @@ void draw_items(Element *element)
         graph.x = i * graph.width;
         graph.y = HEIGHT - graph.height;
 
-        float padding = graph.width - (graph.width * 0.9f);
+        float padding = graph.width - (graph.width * 0.8f);
         graph.x     += padding * 0.5f;
         graph.width -= padding;
 
@@ -152,14 +152,21 @@ void selection_sort(Element *element)
         left = element->size;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: %s <size>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    
     Element   element;
-    Algorithm algorithm = selection_sort;
+    Algorithm algorithm = bubble_sort;
 
 
     // Element's allocation
-    element.capc  = 200;
+    element.capc  = atoi(argv[1]);
     element.size  = 1;
     element.items = malloc(sizeof(*element.items) * element.size);
 
