@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <time.h>
 
 
@@ -77,7 +78,7 @@ void draw_items(Element *element)
 void show_graph(Element *element, Algorithm algorithm)
 {
     InitWindow(WIDTH, HEIGHT, "sortview -- yes yes welcome");
-    SetTargetFPS(10);
+    SetTargetFPS(element->size);
 
 
     while (!WindowShouldClose())
@@ -90,7 +91,8 @@ void show_graph(Element *element, Algorithm algorithm)
         ClearBackground(BG);
         draw_items(element);
 
-        DrawText(TextFormat("swapped: %d", swapped), 0, 0, 30, GREEN);
+        DrawText(TextFormat("N: %d", element->size), 0, 0, 30, GREEN);
+        DrawText(TextFormat("swapped: %d", swapped), 0, 30, 30, GREEN);
         
         EndDrawing();
     }
@@ -115,10 +117,45 @@ void bubble_sort(Element *element)
     }
 }
 
+void insertion_sort(Element *element)
+{
+    (void) element;
+
+    // TODO: insertion sort for tomorrow.
+    assert(false && "Not implement yet!");
+}
+
+void selection_sort(Element *element)
+{
+    if (element->a < element->size-1)
+    {
+        if (element->items[element->a] > element->items[element->b])
+        {
+            swap(&element->items[element->a], &element->items[element->b]);
+            swapped++;
+        }
+
+
+        if (element->b % (element->size - 1))
+        {
+            element->b++;
+        }
+        else
+        {
+            if (element->a != element->b)
+                element->a++;
+            
+            element->b = element->a + 1;
+        }
+    }
+    else
+        left = element->size;
+}
+
 int main(void)
 {
     Element   element;
-    Algorithm algorithm = bubble_sort;
+    Algorithm algorithm = selection_sort;
 
 
     // Element's allocation
