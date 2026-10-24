@@ -159,7 +159,7 @@ int main(void)
 
 
     // Element's allocation
-    element.capc  = 20;
+    element.capc  = 200;
     element.size  = 1;
     element.items = malloc(sizeof(*element.items) * element.size);
 
