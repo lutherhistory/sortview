@@ -18,7 +18,7 @@
 void draw_visualizer(Element *elm, Algorithm sorting_step)
 {
     InitWindow(WIDTH, HEIGHT, TITLE);
-    SetTargetFPS(60);
+    SetTargetFPS(20);
 
     Req   req   = { 0 };
     bool  broke = false;
@@ -50,7 +50,7 @@ void draw_visualizer(Element *elm, Algorithm sorting_step)
                 }
                 else
                 {
-                    tint = (req.x == i || req.y == i) ? RED : RAYWHITE;
+                    tint = req.disable && (req.x == i || req.y == i) ? RED : RAYWHITE;
                 }
 
 
@@ -75,17 +75,14 @@ void draw_visualizer(Element *elm, Algorithm sorting_step)
 
 int main(void)
 {
-    const int N = 200;
+    const int N = 5;
 
 
     Element   elm = { 0 };
-    Algorithm alg = insertion_sort;
+    Algorithm alg = bogo_sort;
 
 
     alloc_elm(&elm, N, shuffle_order);
-    printf("capacity: %zu\n", elm.capacity);
-    printf("count: %zu\n", elm.count);
-
     draw_visualizer(&elm, alg);
 
     free_elm(&elm);

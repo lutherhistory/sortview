@@ -25,6 +25,16 @@ int is_sorted(Element *elm)
     return false;
 }
 
+void shuffle_order(Element *elm)
+{
+    srand(time(0));
+    for (size_t i=0; i < elm->count; i++)
+    {
+        size_t j = (size_t) rand() % (i + 1);
+        swap(&elm->items[i], &elm->items[j]);
+    }
+}
+
 void bubble_sort(Element *elm, Req *req)
 {
     if (abs(req->finished) < elm->count)
@@ -121,5 +131,14 @@ void insertion_sort(Element *elm, Req *req)
     else
     {
         req->finished = true;
+    }
+}
+
+void bogo_sort(Element *elm, Req *req)
+{
+    req->disable  = false;
+    if (!(req->finished = !is_sorted(elm)))
+    {
+        shuffle_order(elm);
     }
 }

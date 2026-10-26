@@ -9,6 +9,7 @@ typedef struct
     // boolean types
     int finished;
     int swapped;
+    int disable; // NOTE: disable the indicators.
 
     // helpers.
     int swaps; 

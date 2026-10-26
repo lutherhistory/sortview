@@ -1,8 +1,6 @@
 #include "visualizer.h"
 #include "algorithm.h"
 
-#include <time.h>
-
 void alloc_elm(Element *elm, const int N, void (*order)(Element*))
 {
     for (int i=0; i < N; i++)
@@ -36,14 +34,4 @@ void alloc_elm(Element *elm, const int N, void (*order)(Element*))
 void free_elm(Element *elm)
 {
     free(elm->items);
-}
-
-void shuffle_order(Element *elm)
-{
-    srand(time(0));
-    for (size_t i=0; i < elm->count; i++)
-    {
-        size_t j = (size_t) rand() % (i + 1);
-        swap(&elm->items[i], &elm->items[j]);
-    }
 }
