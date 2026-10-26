@@ -9,12 +9,15 @@ SRC    = $(wildcard src/*.c)
 OBJ    = $(patsubst src/%.c, build/cache/%.o, $(SRC))
 
 
-.PHONY: all run
+.PHONY: all run clean
 
 all: $(TARGET)
 
 run: $(TARGET)
 	./$< $(ARGS)
+
+clean:
+	rm -rf build
 
 
 $(TARGET): $(OBJ)
@@ -23,4 +26,4 @@ $(TARGET): $(OBJ)
 
 build/cache/%.o: src/%.c
 	@mkdir -p build/cache
-	$(CC) $(CFLAGS) -o $@ -c $^ $(INC)
+	$(CC) $(CFLAGS) $(INC) -o $@ -c $^ $(INC)
