@@ -15,5 +15,4 @@ void free_elm(Element *elm);
 // -- ( Some Helpers Functions ) -- 
 void shuffle_order(Element *elm);
 
-
 #endif //VISUALIZER_H

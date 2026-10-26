@@ -75,14 +75,17 @@ void draw_visualizer(Element *elm, Algorithm sorting_step)
 
 int main(void)
 {
-    const int N = 20;
+    const int N = 200;
 
 
     Element   elm = { 0 };
-    Algorithm alg = selection_sort;
+    Algorithm alg = insertion_sort;
 
 
     alloc_elm(&elm, N, shuffle_order);
+    printf("capacity: %zu\n", elm.capacity);
+    printf("count: %zu\n", elm.count);
+
     draw_visualizer(&elm, alg);
 
     free_elm(&elm);

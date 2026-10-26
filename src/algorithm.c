@@ -14,13 +14,15 @@ void swap(int *a, int *b)
 
 int is_sorted(Element *elm)
 {
-    for (size_t i=0, j=1; i < elm->count; i++, j++)
+    for (size_t i=1; i < elm->count; i++)
     {
-        if (elm->items[i] < elm->items[j])
-            return false;
+        if (elm->items[i-1] > elm->items[i])
+        {
+            return true;
+        }
     }
 
-    return true;
+    return false;
 }
 
 void bubble_sort(Element *elm, Req *req)
@@ -94,8 +96,30 @@ void merge_sort(Element *elm, Req *req)
 
 void insertion_sort(Element *elm, Req *req)
 {
-    (void) elm, (void) req;
+    if (req->y < elm->count)
+    {
+        if (req->x > 0 && elm->items[req->x-1] > elm->items[req->x])
+        {
+            swap(&elm->items[req->x-1], &elm->items[req->x]);
 
-    // TODO: for 26.10.2026
-    assert(false && "Not implement yet!");
+            if (req->x > 0)
+                req->x--;
+        }
+        else
+        {
+            if (elm->items[req->x] > elm->items[req->y])
+            {
+                swap(&elm->items[req->x], &elm->items[req->y]);
+            }
+            else
+            {
+                req->y = (req->y % (elm->count)) + 1;
+                req->x = req->y - 1;
+            }
+        }     
+    }
+    else
+    {
+        req->finished = true;
+    }
 }
