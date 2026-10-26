@@ -5,12 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct
-{
-    int *items;
-    size_t count;
-    size_t capacity;
-} Element;
+#include "struct.h"
 
 // -- ( Memory Management ) --
 void alloc_elm(Element *elm, const int N, void (*order)(Element*));

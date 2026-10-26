@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "visualizer.h"
+#include "algorithm.h"
 
 
 #define BG  (Color) { 0x18, 0x18, 0x18, 0xff }
@@ -14,21 +15,45 @@
 #define TITLE  "sortview -- just write something"
 
 
-const int N = 20;
-
-
-void draw_visualizer(Element *elm, void*)
+void draw_visualizer(Element *elm, Algorithm sorting_step)
 {
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(60);
 
+    Req   req   = { 0 };
+    bool  broke = false;
+
     while (!WindowShouldClose())
     {
+        if (sorting_step)
+        {
+            if (req.finished > 0)
+                broke = is_sorted(elm);
+
+            else
+                sorting_step(elm, &req);
+        }
+
+
         BeginDrawing();
         {
             ClearBackground(BG);
-            for (size_t i=0; i < elm->count; i++)
+
+            Color tint = RAYWHITE;
+
+
+            for (int i=0; i < (int) elm->count; i++)
             {
+                if (req.finished > 0)
+                {
+                    tint = !broke ? GREEN : RAYWHITE;
+                }
+                else
+                {
+                    tint = (req.x == i || req.y == i) ? RED : RAYWHITE;
+                }
+
+
                 Rectangle rec = {
                     .width  = WIDTH  / elm->count,
                     .height = HEIGHT / elm->count * elm->items[i] * 0.9f
@@ -39,7 +64,7 @@ void draw_visualizer(Element *elm, void*)
                 rec.width  *= 0.9f;
 
 
-                DrawRectangleRec(rec, RAYWHITE);
+                DrawRectangleRec(rec, tint);
             }            
         }
         EndDrawing();
@@ -50,12 +75,15 @@ void draw_visualizer(Element *elm, void*)
 
 int main(void)
 {
-    Element elm = { 0 };
+    const int N = 20;
+
+
+    Element   elm = { 0 };
+    Algorithm alg = selection_sort;
+
+
     alloc_elm(&elm, N, shuffle_order);
-
-
-    draw_visualizer(&elm, NULL);
-
+    draw_visualizer(&elm, alg);
 
     free_elm(&elm);
     return 0;

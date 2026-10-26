@@ -1,54 +1,101 @@
-#if 0
+#include <stddef.h>
+#include <stdlib.h>
+#include <assert.h>
 
-void bubble_sort(Element *element)
+#include "algorithm.h"
+
+
+void swap(int *a, int *b)
 {
-    if (left < element->size) {
-        if (element->items[element->a] > element->items[element->b])
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+int is_sorted(Element *elm)
+{
+    for (size_t i=0, j=1; i < elm->count; i++, j++)
+    {
+        if (elm->items[i] < elm->items[j])
+            return false;
+    }
+
+    return true;
+}
+
+void bubble_sort(Element *elm, Req *req)
+{
+    if (abs(req->finished) < elm->count)
+    {
+        // Swaps
+        if (elm->items[req->x] > elm->items[req->y])
         {
-            swap(&element->items[element->a], &element->items[element->b]);
-            swapped++;
+            swap(&elm->items[req->x], &elm->items[req->y]);
+            req->swaps++;
         }
-        
-        element->b = element->b % (element->size - left) + 1;
-        if (!(element->a = element->b - 1))
+
+        // Looping
+        req->y = (req->y % (elm->count + req->finished)) + 1;
+        if ((req->x = req->y - 1) == 0)
         {
-            left++;
+            req->finished--;
         }
+    }
+    else
+    {
+        req->finished = elm->count;
     }
 }
 
-void insertion_sort(Element *element)
+void selection_sort(Element *elm, Req *req)
 {
-    (void) element;
+    static int min_idx = 0;
 
-    // TODO: insertion sort for tomorrow.
-    assert(false && "Not implement yet!");
-}
 
-void selection_sort(Element *element)
-{
-    if (element->a < element->size - 2)
+    if (req->x < (int) elm->count - 1)
     {
-        static int min = 0;
-
-
-        if (element->b % (element->size - 1))
+        if (req->y % ((int) elm->count))
         {
-            if (element->items[element->b] < element->items[min])
-                min = element->b;
-            
-            element->b++;
+            if (elm->items[min_idx] > elm->items[req->y])
+                min_idx = req->y;
+
+            req->y++;
         }
         else
         {
-            swap(&element->items[element->a], &element->items[min]);
+            if (req->x != req->y)
+            {
+                swap(&elm->items[min_idx], &elm->items[req->x]);
+                min_idx = ++req->x;
+            }
 
-
-            if (element->a != element->b)
-                min = element->a++;
-
-            element->b = element->a + 1;
+            req->y = req->x + 1;
         }
     }
+    else
+        req->finished = 1;
 }
-#endif
+
+void quick_sort(Element *elm, Req *req)
+{
+    (void) elm, (void) req;
+
+    // TODO: for 28.10.2026
+    assert(false && "Not implement yet!");    
+}
+
+void merge_sort(Element *elm, Req *req)
+{
+    (void) elm, (void) req;
+
+    // TODO: for 27.10.2026
+    assert(false && "Not implement yet!");    
+}
+
+void insertion_sort(Element *elm, Req *req)
+{
+    (void) elm, (void) req;
+
+    // TODO: for 26.10.2026
+    assert(false && "Not implement yet!");
+}
